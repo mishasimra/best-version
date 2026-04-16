@@ -1,0 +1,17 @@
+{
+  "name": "best-version",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:demo": "concurrently \"cross-env USE_IN_MEMORY_DB=true AUTO_SEED_DEMO=true npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "stop:dev": "powershell -NoProfile -Command \"$ports = 5000,4173; $connections = Get-NetTCPConnection -LocalPort $ports -ErrorAction SilentlyContinue | Select-Object -Unique OwningProcess; foreach ($connection in $connections) { if ($connection.OwningProcess -gt 0) { Stop-Process -Id $connection.OwningProcess -Force -ErrorAction SilentlyContinue } }\"",
+    "build": "npm --prefix frontend run build",
+    "seed": "npm --prefix backend run seed",
+    "seed:demo": "cross-env USE_IN_MEMORY_DB=true npm --prefix backend run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3"
+  }
+}
