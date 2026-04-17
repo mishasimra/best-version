@@ -1,4 +1,4 @@
-import { ArrowRight, BriefcaseBusiness, Globe2, Rocket, Sparkles, Trophy, Users2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Globe2, Play, Quote, Rocket, Sparkles, Trophy, Users2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "../../components/layout/Footer";
@@ -30,53 +30,109 @@ const features = [
   },
 ];
 
-const visualStories = [
+const youtubeVideos = [
+  // Replace these titles and embed URLs with your own YouTube videos later.
   {
-    title: "Learn with energy, not friction",
-    image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80",
-    meta: "Courses + guided momentum",
+    title: "Momentum that survives low-motivation days",
+    description: "A sharper reset on consistency, habit loops, and staying visible over time.",
+    embedUrl: "https://www.youtube.com/embed/C0XISfVYt78",
+    theme: "Momentum / consistency",
   },
   {
-    title: "Build proof people can actually see",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-    meta: "Projects + portfolio outcomes",
+    title: "Projects that become proof",
+    description: "Why strong work samples beat vague ambition when you want people to notice.",
+    embedUrl: "https://www.youtube.com/embed/Vhh_GeBPOhs",
+    theme: "Projects / proof / portfolio",
   },
   {
-    title: "Connect ambition to opportunities",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
-    meta: "Mentors + teams + gigs",
+    title: "Opportunity readiness for internships and beyond",
+    description: "A practical watch on standing out for internships, early roles, and growth openings.",
+    embedUrl: "https://www.youtube.com/embed/3sK3wJAxGfs",
+    theme: "Internships / opportunities",
   },
 ];
+
+const journeySteps = [
+  "Discover your strengths and unlock your next path.",
+  "Start a focused course and build a visible progress streak.",
+  "Ship portfolio-ready projects and submit your work.",
+  "Join competitions, find mentors, and earn through gigs.",
+  "Turn your work into a profile recruiters want to open.",
+];
+
+const journeyTestimonials = [
+  {
+    quote: "Best Version gave me a clear sequence: assess, build, compete, earn. It finally felt like my growth had a system.",
+    name: "Aarav",
+    role: "Frontend learner",
+    initials: "AA",
+  },
+  {
+    quote: "The mix of portfolio, mentoring, and startup-style opportunities feels much closer to real career momentum than a normal course platform.",
+    name: "Neha",
+    role: "Product mentor",
+    initials: "NP",
+  },
+];
+
+function getYouTubeThumbnail(embedUrl) {
+  const videoId = embedUrl.split("/embed/")[1]?.split("?")[0];
+  return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : "";
+}
 
 export function LandingPage() {
   const carouselSlides = useMemo(
     () => [
       {
-        title: "Momentum Streaks",
-        description: "Keep your weekly streak alive with tiny wins that stack into visibility.",
-        meta: "7-day streaks + XP bursts",
+        title: "Momentum That Compounds",
+        description: "Turn small weekly wins into a streak recruiters can actually feel.",
+        meta: "Streaks + visible progress",
+        image: "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80",
+        accent: "7 day climb",
       },
       {
-        title: "Proof-First Projects",
-        description: "Ship real builds with milestones, mentor feedback, and portfolio-ready outcomes.",
-        meta: "Build studio + submissions",
+        title: "Projects That Prove It",
+        description: "Ship real work with milestones, demos, and portfolio-ready receipts.",
+        meta: "Build studio + proof loops",
+        image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+        accent: "3 live builds",
       },
       {
-        title: "Opportunity Radar",
-        description: "Track internships, gigs, and competitions without leaving your growth hub.",
-        meta: "Gigs + competitions",
+        title: "Opportunities Find Signal",
+        description: "Surface internships, gigs, and competitions the moment your profile gets sharper.",
+        meta: "Internships + gigs + visibility",
+        image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+        accent: "41 fresh openings",
       },
     ],
     []
   );
   const [activeSlide, setActiveSlide] = useState(0);
+  const [playingVideos, setPlayingVideos] = useState({});
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
-    }, 4200);
-    return () => clearInterval(timer);
-  }, [carouselSlides.length]);
+    const previousScrollRestoration = window.history.scrollRestoration;
+
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    window.scrollTo({ top: 0, behavior: "auto" });
+
+    return () => {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = previousScrollRestoration;
+      }
+    };
+  }, []);
+
+  function goToPreviousSlide() {
+    setActiveSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  }
+
+  function goToNextSlide() {
+    setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
+  }
 
   return (
     <div className="landing">
@@ -176,21 +232,43 @@ export function LandingPage() {
       <section className="landing-section animate-on" style={{ "--delay": "0.06s" }}>
         <SectionHeader
           eyebrow="Spotlight"
-          title="A carousel of real momentum"
-          description="A quick glance at how Best Version keeps growth visible, playful, and high-signal."
+          title="Momentum you can actually show"
+          description="A faster look at how Best Version turns effort into proof, signal, and real opportunities."
         />
         <div className="landing-carousel">
-          <div className="landing-carousel-track">
+          <div className="landing-carousel-header">
+            <div className="landing-carousel-status">
+              <span className="landing-carousel-kicker">Now surfacing</span>
+              <strong>{carouselSlides[activeSlide].meta}</strong>
+            </div>
+            <div className="landing-carousel-controls">
+              <button type="button" className="landing-carousel-arrow" onClick={goToPreviousSlide} aria-label="Previous spotlight">
+                <ArrowLeft size={16} />
+              </button>
+              <button type="button" className="landing-carousel-arrow" onClick={goToNextSlide} aria-label="Next spotlight">
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+          <div className="landing-carousel-viewport">
+          <div className="landing-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
             {carouselSlides.map((slide, index) => (
               <Card
                 key={slide.title}
                 className={`landing-carousel-card ${index === activeSlide ? "landing-carousel-card-active" : ""}`}
               >
-                <strong>{slide.title}</strong>
-                <p>{slide.description}</p>
-                <span>{slide.meta}</span>
+                <div className="landing-carousel-visual">
+                  <img src={slide.image} alt={slide.title} className="landing-carousel-image" />
+                  <span className="landing-carousel-badge">{slide.accent}</span>
+                </div>
+                <div className="landing-carousel-copy">
+                  <span>{slide.meta}</span>
+                  <strong>{slide.title}</strong>
+                  <p>{slide.description}</p>
+                </div>
               </Card>
             ))}
+          </div>
           </div>
           <div className="landing-carousel-dots">
             {carouselSlides.map((slide, index) => (
@@ -223,40 +301,63 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-section animate-on" style={{ "--delay": "0.18s" }}>
+      <section className="landing-section animate-on" style={{ "--delay": "0.21s" }}>
         <SectionHeader
-          eyebrow="Visual energy"
-          title="A platform that looks alive because the people inside it are building in public"
-          description="We designed the visual language around momentum, collaboration, and visible progress instead of generic startup minimalism."
+          eyebrow="Watch"
+          title="See the Best Version mindset in motion"
+          description="Three quick videos that fit the same growth-first energy: momentum, projects, and opportunity readiness."
         />
-        <div className="visual-story-grid">
-          {visualStories.map((story) => (
-            <Card key={story.title} className="visual-story-card">
-              <img src={story.image} alt={story.title} className="visual-story-image" />
-              <div className="visual-story-copy">
-                <span className="pill">{story.meta}</span>
-                <h3>{story.title}</h3>
+        <div className="youtube-grid">
+          {youtubeVideos.map((video, index) => (
+            <Card key={video.title} className="youtube-card">
+              <div className="youtube-frame">
+                {playingVideos[index] ? (
+                  <iframe
+                    src={`${video.embedUrl}?autoplay=1&rel=0`}
+                    title={video.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="youtube-preview"
+                    onClick={() => setPlayingVideos((current) => ({ ...current, [index]: true }))}
+                    aria-label={`Play ${video.title}`}
+                  >
+                    <img src={getYouTubeThumbnail(video.embedUrl)} alt={video.title} className="youtube-thumbnail" loading="lazy" />
+                    <span className="youtube-overlay" />
+                    <span className="youtube-play">
+                      <Play size={18} fill="currentColor" />
+                    </span>
+                  </button>
+                )}
+              </div>
+              <div className="youtube-copy">
+                <span className="pill">{video.theme}</span>
+                <h3>{video.title}</h3>
+                <p>{video.description}</p>
               </div>
             </Card>
           ))}
         </div>
       </section>
 
-      <section className="landing-section animate-on" style={{ "--delay": "0.24s" }}>
+      <section className="landing-section journey-section animate-on" style={{ "--delay": "0.24s" }}>
         <SectionHeader
           eyebrow="Journey"
           title="From self-discovery to paid work"
           description="Every major step is connected, so users always know what to do next."
         />
         <div className="journey-grid">
-          {[
-            "Take a strengths assessment and unlock recommended paths.",
-            "Enroll in a focused course and keep a visible progress streak.",
-            "Build portfolio-ready projects and submit your work.",
-            "Join competitions, connect with mentors, and earn through gigs.",
-            "Package your proof into a profile recruiters actually want to open.",
-          ].map((step, index) => (
-            <Card key={step} className="journey-card">
+          {journeySteps.map((step, index) => (
+            <Card
+              key={step}
+              className={`journey-card animate-on ${index === 2 ? "journey-card-featured" : ""}`}
+              style={{ "--delay": `${0.28 + index * 0.04}s` }}
+            >
               <span className="step-badge">0{index + 1}</span>
               <p>{step}</p>
             </Card>
@@ -264,21 +365,124 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-section social-proof animate-on" style={{ "--delay": "0.32s" }}>
-        <Card className="testimonial-card">
-          <p>
-            "Best Version gave me a clear sequence: assess, build, compete, earn. It finally felt like my growth had a
-            system."
-          </p>
-          <strong>Aarav, frontend learner</strong>
-        </Card>
-        <Card className="testimonial-card">
-          <p>
-            "The mix of portfolio, mentoring, and startup-style opportunities makes this feel much closer to real
-            career momentum than a normal course platform."
-          </p>
-          <strong>Neha, product mentor</strong>
-        </Card>
+      <section className="landing-section social-proof journey-proof animate-on" style={{ "--delay": "0.32s" }}>
+        {journeyTestimonials.map((testimonial) => (
+          <Card
+            key={testimonial.name}
+            className="journey-testimonial-card"
+            style={{
+              padding: "1.2rem 1.25rem",
+              borderRadius: "22px",
+              border: "1px solid rgba(19, 33, 23, 0.08)",
+              background: "rgba(255, 255, 255, 0.94)",
+              boxShadow: "0 14px 28px rgba(19, 33, 23, 0.06)",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "40px minmax(0, 1fr)",
+                columnGap: "0.9rem",
+                rowGap: "0.9rem",
+                alignItems: "start",
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "999px",
+                  background: "rgba(31, 143, 95, 0.12)",
+                  color: "var(--brand-dark)",
+                  flexShrink: 0,
+                }}
+              >
+                <Quote size={18} />
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.85rem",
+                  minWidth: 0,
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.97rem",
+                    lineHeight: 1.65,
+                    color: "var(--text)",
+                    width: "100%",
+                    maxWidth: "none",
+                  }}
+                >
+                  "{testimonial.quote}"
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.7rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "38px",
+                      height: "38px",
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      background: "linear-gradient(135deg, rgba(255, 184, 77, 0.88), rgba(31, 143, 95, 0.88))",
+                      color: "#173627",
+                      fontSize: "0.76rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.03em",
+                    }}
+                  >
+                    {testimonial.initials}
+                  </span>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      gap: "0.08rem",
+                      minWidth: 0,
+                    }}
+                  >
+                    <strong
+                      style={{
+                        fontSize: "0.94rem",
+                        lineHeight: 1.15,
+                        color: "var(--text)",
+                        fontWeight: 800,
+                      }}
+                    >
+                      {testimonial.name}
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: "0.82rem",
+                        lineHeight: 1.2,
+                        color: "var(--text-soft)",
+                      }}
+                    >
+                      {testimonial.role}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
       </section>
 
       <footer className="landing-footer">

@@ -95,10 +95,10 @@ function useAuthOptions() {
   return googleConfig;
 }
 
-function AuthLayout({ title, subtitle, children, cardClassName = "" }) {
+function AuthLayout({ title, subtitle, children, cardClassName = "", showcaseStyle = undefined }) {
   return (
     <div className="auth-page" style={{ "--auth-bg": `url(${AUTH_BACKGROUND})` }}>
-      <div className="auth-showcase">
+      <div className="auth-showcase" style={showcaseStyle}>
         <div className="auth-brand-row">
           <BrandLogo />
         </div>
@@ -223,26 +223,46 @@ export function SignupPage() {
       title="Create your account"
       subtitle="Start with a free profile and personalize your growth path."
       cardClassName="signup-card"
+      showcaseStyle={{
+        justifyContent: "flex-start",
+        alignSelf: "stretch",
+        paddingTop: "5rem",
+        textAlign: "left",
+      }}
     >
-      <form className="stack signup-form" onSubmit={handleSubmit}>
-        <Field label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <Field label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <Field
-          label="Password"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
-        <label className="field">
-          <span>Primary role</span>
-          <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-            <option value="student">Student</option>
-            <option value="graduate">Graduate</option>
-            <option value="freelancer">Freelancer</option>
-            <option value="professional">Professional</option>
-          </select>
-        </label>
-        <div className="signup-action-stack">
+      <form className="signup-form" onSubmit={handleSubmit}>
+        <div
+          style={{
+            display: "grid",
+            gap: "1rem",
+          }}
+        >
+          <Field label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <Field label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <Field
+            label="Password"
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+          <label className="field">
+            <span>Primary role</span>
+            <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+              <option value="student">Student</option>
+              <option value="graduate">Graduate</option>
+              <option value="freelancer">Freelancer</option>
+              <option value="professional">Professional</option>
+            </select>
+          </label>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gap: "0.9rem",
+            marginTop: "1.1rem",
+          }}
+        >
           <Button disabled={loading || googleLoading} type="submit">
             {loading ? "Creating account..." : "Create account"}
           </Button>
@@ -254,16 +274,36 @@ export function SignupPage() {
             noteClassName="signup-google-note"
           />
         </div>
-        <p className="auth-note signup-note">Choose the path that gets you building fastest.</p>
-        <div className="signup-secondary-actions">
-          <Link to="/">
-            <Button type="button" variant="ghost" className="signup-back-btn">
-              Back to main page
-            </Button>
-          </Link>
-          <Link className="signup-login-link" to="/login">
-            Log in
-          </Link>
+
+        <p
+          className="auth-note signup-note"
+          style={{
+            marginTop: "0.9rem",
+          }}
+        >
+          Choose the path that gets you building fastest.
+        </p>
+
+        <div
+          style={{
+            display: "grid",
+            gap: "0.9rem",
+            marginTop: "1rem",
+            paddingTop: "1rem",
+            borderTop: "1px solid rgba(19, 33, 23, 0.08)",
+          }}
+        >
+          <div className="signup-secondary-actions" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
+            <Link to="/">
+              <Button type="button" variant="ghost" className="signup-back-btn">
+                Back to main page
+              </Button>
+            </Link>
+          </div>
+          <div className="auth-links">
+            <Link to="/forgot-password">Forgot password?</Link>
+            <Link to="/login">Log in</Link>
+          </div>
         </div>
       </form>
     </AuthLayout>
@@ -286,6 +326,7 @@ export function ForgotPasswordPage() {
       <form className="stack" onSubmit={handleSubmit}>
         <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Button type="submit">Generate reset token</Button>
+        <Link to="/login">Back to login</Link>
         {token ? (
           <Card className="inline-note">
             <strong>Token</strong>

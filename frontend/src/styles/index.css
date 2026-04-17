@@ -400,6 +400,8 @@ p {
 
 .landing-carousel {
   position: relative;
+  max-width: 980px;
+  margin: 0 auto;
   padding: 1.4rem;
   border-radius: 26px;
   background:
@@ -410,41 +412,150 @@ p {
   box-shadow: 0 24px 60px rgba(19, 33, 23, 0.08);
 }
 
-.landing-carousel-track {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.landing-carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 0.85rem;
 }
 
-.landing-carousel-card {
+.landing-carousel-status {
   display: grid;
-  gap: 0.6rem;
-  border-radius: 22px;
-  padding: 1.1rem;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  transition: transform 260ms ease, box-shadow 260ms ease, opacity 260ms ease;
+  gap: 0.2rem;
 }
 
-.landing-carousel-card strong {
-  font-size: 1.1rem;
+.landing-carousel-kicker {
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--brand-dark);
+}
+
+.landing-carousel-status strong {
+  font-size: 1rem;
   font-family: "Space Grotesk", sans-serif;
 }
 
-.landing-carousel-card span {
+.landing-carousel-controls {
+  display: flex;
+  gap: 0.55rem;
+}
+
+.landing-carousel-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(19, 33, 23, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.landing-carousel-arrow:hover,
+.landing-carousel-arrow:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 24px rgba(19, 33, 23, 0.1);
+}
+
+.landing-carousel-viewport {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.landing-carousel-track {
+  display: flex;
+  transition: transform 380ms ease;
+  will-change: transform;
+}
+
+.landing-carousel-card {
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  align-items: center;
+  gap: 1rem;
+  border-radius: 22px;
+  padding: 0.95rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  transition: transform 260ms ease, box-shadow 260ms ease, opacity 260ms ease, border-color 260ms ease;
+  overflow: hidden;
+}
+
+.landing-carousel-visual {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  aspect-ratio: 1.45 / 0.92;
+  max-height: 250px;
+  background: linear-gradient(145deg, rgba(31, 143, 95, 0.16), rgba(255, 184, 77, 0.16));
+}
+
+.landing-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 520ms ease, filter 320ms ease;
+  filter: saturate(1.02);
+}
+
+.landing-carousel-badge {
+  position: absolute;
+  left: 0.85rem;
+  bottom: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(20, 38, 29, 0.72);
+  color: white;
+  font-size: 0.76rem;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+}
+
+.landing-carousel-copy {
+  display: grid;
+  gap: 0.4rem;
+  align-content: center;
+}
+
+.landing-carousel-copy span {
   font-size: 0.78rem;
   font-weight: 700;
   color: var(--brand-dark);
+}
+
+.landing-carousel-copy strong {
+  font-size: 1.12rem;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.landing-carousel-copy p {
+  max-width: 34ch;
 }
 
 .landing-carousel-card-active {
   transform: translateY(-6px);
   box-shadow: 0 18px 40px rgba(19, 33, 23, 0.14);
   background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(31, 143, 95, 0.18);
+}
+
+.landing-carousel-card:hover .landing-carousel-image,
+.landing-carousel-card-active .landing-carousel-image {
+  transform: scale(1.06);
 }
 
 .landing-carousel-dots {
-  margin-top: 0.8rem;
+  margin-top: 1rem;
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -457,10 +568,12 @@ p {
   border: 0;
   background: rgba(19, 33, 23, 0.2);
   cursor: pointer;
+  transition: width 200ms ease, background 200ms ease, transform 200ms ease;
 }
 
 .landing-carousel-dots button.active {
   background: var(--brand);
+  width: 28px;
 }
 
 .hero-stage {
@@ -713,17 +826,6 @@ p {
   background: radial-gradient(circle, rgba(255, 184, 77, 0.24), transparent 70%);
 }
 
-.visual-story-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.visual-story-card {
-  padding: 0;
-  overflow: hidden;
-}
-
 .animate-on {
   opacity: 0;
   transform: translateY(18px);
@@ -731,17 +833,136 @@ p {
   animation-delay: var(--delay, 0s);
 }
 
-.visual-story-image {
-  aspect-ratio: 5 / 6;
+.youtube-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-.visual-story-copy {
+.youtube-card {
+  padding: 0;
+  overflow: hidden;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.youtube-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 54px rgba(19, 33, 23, 0.12);
+}
+
+.youtube-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 184, 77, 0.18), transparent 24%),
+    linear-gradient(160deg, #163124, #214f39 60%, #143120);
+}
+
+.youtube-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background: transparent;
+}
+
+.youtube-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 420ms ease;
+}
+
+.youtube-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(16, 30, 22, 0.08), rgba(16, 30, 22, 0.48));
+  transition: background 260ms ease, opacity 260ms ease;
+}
+
+.youtube-play {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-dark);
+  box-shadow: 0 16px 40px rgba(10, 20, 14, 0.25);
+  transition: transform 220ms ease, background 220ms ease;
+}
+
+.youtube-card:hover .youtube-thumbnail,
+.youtube-preview:focus-visible .youtube-thumbnail {
+  transform: scale(1.05);
+}
+
+.youtube-card:hover .youtube-overlay,
+.youtube-preview:focus-visible .youtube-overlay {
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(16, 30, 22, 0.02), rgba(16, 30, 22, 0.38));
+}
+
+.youtube-card:hover .youtube-play,
+.youtube-preview:focus-visible .youtube-play {
+  transform: translate(-50%, -50%) scale(1.05);
+  background: #ffffff;
+}
+
+.youtube-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  animation: fadeUp 240ms ease;
+}
+
+.youtube-copy {
+  display: grid;
+  gap: 0.55rem;
   padding: 1rem 1rem 1.15rem;
 }
 
 .journey-card {
   position: relative;
   overflow: hidden;
+  min-height: 150px;
+  padding: 1.05rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(19, 33, 23, 0.08);
+  box-shadow: 0 16px 34px rgba(19, 33, 23, 0.08);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+
+.journey-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 42px rgba(19, 33, 23, 0.1);
+  border-color: rgba(31, 143, 95, 0.16);
+}
+
+.journey-card-featured {
+  transform: scale(1.015);
+  background:
+    radial-gradient(circle at top right, rgba(255, 184, 77, 0.12), transparent 24%),
+    rgba(255, 255, 255, 0.95);
+  border-color: rgba(31, 143, 95, 0.18);
+  box-shadow: 0 20px 40px rgba(19, 33, 23, 0.1);
+}
+
+.journey-card-featured:hover {
+  transform: translateY(-4px) scale(1.015);
 }
 
 .journey-card::before {
@@ -755,10 +976,96 @@ p {
   transform: rotate(18deg);
 }
 
-.testimonial-card {
+.journey-card p {
+  max-width: 18ch;
+}
+
+.journey-testimonial-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.95rem;
   background:
-    radial-gradient(circle at top right, rgba(255, 184, 77, 0.15), transparent 26%),
-    rgba(255, 255, 255, 0.88);
+    radial-gradient(circle at top right, rgba(255, 184, 77, 0.12), transparent 20%),
+    linear-gradient(180deg, rgba(246, 248, 241, 0.96), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(19, 33, 23, 0.07);
+  box-shadow: 0 14px 28px rgba(19, 33, 23, 0.06);
+}
+
+.journey-testimonial-quote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(31, 143, 95, 0.12);
+  color: var(--brand-dark);
+  flex-shrink: 0;
+}
+
+.journey-testimonial-card p {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.journey-testimonial-person {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: auto;
+}
+
+.journey-testimonial-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 184, 77, 0.88), rgba(31, 143, 95, 0.88));
+  color: #173627;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.journey-testimonial-person strong,
+.journey-testimonial-person span {
+  display: block;
+}
+
+.journey-testimonial-person div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.journey-testimonial-person strong {
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.journey-testimonial-person span {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.journey-section .section-header,
+.journey-proof {
+  margin-top: 0.2rem;
+}
+
+.journey-section .section-header {
+  margin-bottom: 0.8rem;
+}
+
+.journey-proof {
+  margin-top: 0.85rem;
 }
 
 .landing-footer {
@@ -1556,7 +1863,7 @@ p {
   .grid-two,
   .feature-grid,
   .grid-three,
-  .visual-story-grid,
+  .youtube-grid,
   .course-grid,
   .hero-stats,
   .stats-grid,
@@ -1567,6 +1874,30 @@ p {
 
   .landing-carousel-track {
     grid-template-columns: 1fr;
+  }
+
+  .landing-carousel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-carousel-controls {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .landing-carousel-card {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .landing-carousel-visual {
+    aspect-ratio: 1.38 / 0.98;
+    max-height: 220px;
+  }
+
+  .landing-carousel-copy p {
+    max-width: none;
   }
 
   .sidebar {
