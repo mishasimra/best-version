@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../api/client";
 import { Footer } from "../../components/layout/Footer";
 import { BrandLogo } from "../../components/ui/BrandLogo";
-import { Button, Card, Field } from "../../components/ui/UI";
+import { Button, Card, Field, LoadingState } from "../../components/ui/UI";
 import { useAuth } from "../../context/AuthContext";
 
 const AUTH_BACKGROUND =
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80";
+
+function getGoogleStartUrl() {
+  const base = import.meta.env.VITE_API_URL || "/api";
+  return `${base.replace(/\/$/, "")}/auth/google/start`;
+}
 
 function GoogleGlyph() {
   return (
@@ -33,7 +38,64 @@ function GoogleGlyph() {
   );
 }
 
-function AuthLayout({ title, subtitle, children }) {
+function GoogleAuthButton({ enabled, loading, onClick, helperText, noteClassName = "" }) {
+  return (
+    <>
+      <Button
+        type="button"
+        variant="secondary"
+        className="auth-google-btn"
+        disabled={!enabled || loading}
+        onClick={enabled ? onClick : undefined}
+        title={!enabled ? helperText : "Continue with Google"}
+      >
+        <GoogleGlyph />
+        {loading ? "Connecting to Google..." : "Continue with Google"}
+      </Button>
+      {!enabled && helperText ? <p className={`auth-google-note ${noteClassName}`.trim()}>{helperText}</p> : null}
+    </>
+  );
+}
+
+function useAuthOptions() {
+  const [googleConfig, setGoogleConfig] = useState({
+    loading: true,
+    enabled: false,
+    message: "Checking Google sign-in availability...",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    api
+      .get("/auth/options")
+      .then((response) => {
+        if (!active) return;
+        const google = response.data?.data?.google || {};
+        setGoogleConfig({
+          loading: false,
+          enabled: Boolean(google.enabled),
+          message: google.message || "Google sign-in is not configured right now.",
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setGoogleConfig({
+          loading: false,
+          enabled: false,
+          message: "Google sign-in is unavailable right now. Please use email and password.",
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return googleConfig;
+}
+
+function AuthLayout({ title, subtitle, children, cardClassName = "" }) {
   return (
     <div className="auth-page" style={{ "--auth-bg": `url(${AUTH_BACKGROUND})` }}>
       <div className="auth-showcase">
@@ -52,7 +114,7 @@ function AuthLayout({ title, subtitle, children }) {
         </div>
       </div>
       <div className="auth-panel">
-        <Card className="auth-card">
+        <Card className={`auth-card ${cardClassName}`.trim()}>
           <div className="auth-card-copy">
             <h2>{title}</h2>
             <p>{subtitle}</p>
@@ -70,6 +132,9 @@ export function LoginPage() {
   const { isAuthenticated, login } = useAuth();
   const [form, setForm] = useState({ email: "aarav@student.best", password: "Password123" });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const googleConfig = useAuthOptions();
+  const googleEnabled = useMemo(() => googleConfig.enabled && !googleConfig.loading, [googleConfig.enabled, googleConfig.loading]);
 
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
@@ -86,6 +151,11 @@ export function LoginPage() {
     }
   }
 
+  function handleGoogleLogin() {
+    setGoogleLoading(true);
+    window.location.href = getGoogleStartUrl();
+  }
+
   return (
     <AuthLayout title="Welcome back" subtitle="Log in to continue building your best version.">
       <form className="stack" onSubmit={handleSubmit}>
@@ -96,7 +166,7 @@ export function LoginPage() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
-        <Button disabled={loading} type="submit">
+        <Button disabled={loading || googleLoading} type="submit">
           {loading ? "Signing in..." : "Log in"}
         </Button>
         <Link to="/">
@@ -104,10 +174,12 @@ export function LoginPage() {
             Back to main page
           </Button>
         </Link>
-        <Button type="button" variant="secondary" className="auth-google-btn">
-          <GoogleGlyph />
-          Continue with Google
-        </Button>
+        <GoogleAuthButton
+          enabled={googleEnabled && !loading}
+          loading={googleLoading}
+          onClick={handleGoogleLogin}
+          helperText={googleConfig.loading ? "Checking Google sign-in availability..." : googleConfig.message}
+        />
         <div className="auth-links">
           <Link to="/forgot-password">Forgot password?</Link>
           <Link to="/signup">Create account</Link>
@@ -122,6 +194,9 @@ export function SignupPage() {
   const { isAuthenticated, register } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "student" });
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const googleConfig = useAuthOptions();
+  const googleEnabled = useMemo(() => googleConfig.enabled && !googleConfig.loading, [googleConfig.enabled, googleConfig.loading]);
 
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
@@ -138,9 +213,18 @@ export function SignupPage() {
     }
   }
 
+  function handleGoogleLogin() {
+    setGoogleLoading(true);
+    window.location.href = getGoogleStartUrl();
+  }
+
   return (
-    <AuthLayout title="Create your account" subtitle="Start with a free profile and personalize your growth path.">
-      <form className="stack" onSubmit={handleSubmit}>
+    <AuthLayout
+      title="Create your account"
+      subtitle="Start with a free profile and personalize your growth path."
+      cardClassName="signup-card"
+    >
+      <form className="stack signup-form" onSubmit={handleSubmit}>
         <Field label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Field label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <Field
@@ -158,10 +242,29 @@ export function SignupPage() {
             <option value="professional">Professional</option>
           </select>
         </label>
-        <Button disabled={loading} type="submit">
-          {loading ? "Creating account..." : "Create account"}
-        </Button>
-        <p className="auth-note">OTP-ready and Google login architecture are already wired for future integrations.</p>
+        <div className="signup-action-stack">
+          <Button disabled={loading || googleLoading} type="submit">
+            {loading ? "Creating account..." : "Create account"}
+          </Button>
+          <GoogleAuthButton
+            enabled={googleEnabled && !loading}
+            loading={googleLoading}
+            onClick={handleGoogleLogin}
+            helperText={googleConfig.loading ? "Checking Google sign-in..." : googleConfig.message}
+            noteClassName="signup-google-note"
+          />
+        </div>
+        <p className="auth-note signup-note">Choose the path that gets you building fastest.</p>
+        <div className="signup-secondary-actions">
+          <Link to="/">
+            <Button type="button" variant="ghost" className="signup-back-btn">
+              Back to main page
+            </Button>
+          </Link>
+          <Link className="signup-login-link" to="/login">
+            Log in
+          </Link>
+        </div>
       </form>
     </AuthLayout>
   );
@@ -217,4 +320,44 @@ export function ResetPasswordPage() {
       </form>
     </AuthLayout>
   );
+}
+
+export function GoogleAuthCallbackPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, loginWithToken } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const token = params.get("token");
+    const error = params.get("error");
+
+    if (error) {
+      toast.error(error);
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (!token) {
+      toast.error("Google sign-in did not return a valid session.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    loginWithToken(token)
+      .then(() => {
+        window.history.replaceState(null, "", "/auth/google/callback");
+        navigate("/dashboard", { replace: true });
+      })
+      .catch((loginError) => {
+        toast.error(loginError.response?.data?.message || "Unable to complete Google sign-in.");
+        navigate("/login", { replace: true });
+      });
+  }, [isAuthenticated, loginWithToken, navigate]);
+
+  return <LoadingState label="Completing Google sign-in..." />;
 }

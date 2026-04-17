@@ -2,7 +2,13 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "../components/layout/AppShell";
 import { LoadingState } from "../components/ui/UI";
 import { useAuth } from "../context/AuthContext";
-import { ForgotPasswordPage, LoginPage, ResetPasswordPage, SignupPage } from "../pages/auth/AuthPages";
+import {
+  ForgotPasswordPage,
+  GoogleAuthCallbackPage,
+  LoginPage,
+  ResetPasswordPage,
+  SignupPage,
+} from "../pages/auth/AuthPages";
 import { DashboardPage } from "../pages/dashboard/DashboardPage";
 import { AdminPage } from "../pages/features/AdminPage";
 import { AssessmentPage } from "../pages/features/AssessmentPage";
@@ -43,6 +49,7 @@ export function App() {
         <Route path="/support" element={<SupportPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/auth/google/callback" element={<GoogleAuthCallbackPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route

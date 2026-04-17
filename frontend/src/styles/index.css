@@ -924,9 +924,59 @@ p {
   height: 18px;
 }
 
+.auth-google-note {
+  margin-top: -0.35rem;
+  font-size: 0.84rem;
+  color: rgba(19, 33, 23, 0.7);
+}
+
 .auth-note,
 .inline-note code {
   word-break: break-all;
+}
+
+.signup-card {
+  padding: 2.35rem 2.2rem;
+}
+
+.signup-form {
+  gap: 1.15rem;
+}
+
+.signup-action-stack {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.signup-note {
+  margin-top: 0.1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.signup-google-note {
+  margin-top: -0.15rem;
+  text-align: center;
+}
+
+.signup-secondary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.3rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(19, 33, 23, 0.08);
+}
+
+.signup-back-btn {
+  min-width: 180px;
+}
+
+.signup-login-link {
+  color: var(--brand-dark);
+  font-weight: 700;
 }
 
 .site-footer {
@@ -1618,6 +1668,15 @@ p {
   .site-footer-meta {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .signup-secondary-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .signup-back-btn {
+    width: 100%;
   }
 
   .topbar,

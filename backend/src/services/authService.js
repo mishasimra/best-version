@@ -1,8 +1,10 @@
 export function buildAuthPlaceholders() {
   return {
     google: {
-      enabled: false,
-      message: "Google OAuth credentials can be added later without changing route contracts.",
+      enabled: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REDIRECT_URI),
+      message: process.env.GOOGLE_CLIENT_ID
+        ? "Google sign-in is configured and ready."
+        : "Google sign-in is unavailable because the server configuration is incomplete.",
     },
     otp: {
       enabled: false,

@@ -57,6 +57,21 @@ export function AuthProvider({ children }) {
         toast.success("Account created");
         return nextAuth;
       },
+      async loginWithToken(token) {
+        const userResponse = await api.get("/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const nextAuth = {
+          token,
+          user: userResponse.data.data.user,
+        };
+        setAuth(nextAuth);
+        localStorage.setItem(storageKey, JSON.stringify(nextAuth));
+        toast.success(`Welcome, ${nextAuth.user.name.split(" ")[0]}`);
+        return nextAuth;
+      },
       logout() {
         setAuth({ token: null, user: null });
         localStorage.removeItem(storageKey);

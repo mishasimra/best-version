@@ -13,7 +13,12 @@ export function createApp() {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.clientUrl,
+      origin(origin, callback) {
+        if (!origin || env.clientUrls.includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error("Origin not allowed by CORS"));
+      },
       credentials: true,
     })
   );

@@ -11,4 +11,11 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || "best-version-dev-secret",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   clientUrl: process.env.CLIENT_URL || "http://127.0.0.1:4173",
+  clientUrls: (process.env.CLIENT_URL || "http://127.0.0.1:4173")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean),
+  googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+  googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || "",
 };
