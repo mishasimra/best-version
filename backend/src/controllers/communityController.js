@@ -43,3 +43,15 @@ export const followUser = asyncHandler(async (req, res) => {
     data: connection,
   });
 });
+
+export const unfollowUser = asyncHandler(async (req, res) => {
+  await Connection.findOneAndDelete({
+    follower: req.user._id,
+    following: req.params.userId,
+  });
+
+  return sendResponse(res, {
+    message: "Connection removed",
+    data: { following: req.params.userId, isFollowing: false },
+  });
+});

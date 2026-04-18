@@ -11,10 +11,14 @@ export function CommunityPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (userId) => api.post(`/community/follow/${userId}`),
-    onSuccess: () => {
-      toast.success("Connection updated");
+    mutationFn: ({ userId, isFollowing }) =>
+      isFollowing ? api.delete(`/community/follow/${userId}`) : api.post(`/community/follow/${userId}`),
+    onSuccess: (_, variables) => {
+      toast.success(variables.isFollowing ? "Unfollowed successfully" : "Connection updated");
       queryClient.invalidateQueries({ queryKey: ["community"] });
+    },
+    onError: () => {
+      toast.error("We couldn't update that connection right now.");
     },
   });
 
@@ -32,8 +36,18 @@ export function CommunityPage() {
                 <strong>{person.name}</strong>
                 <p>{person.headline}</p>
               </div>
-              <Button variant={person.isFollowing ? "secondary" : "primary"} onClick={() => mutation.mutate(person._id)}>
-                {person.isFollowing ? "Following" : "Follow"}
+              <Button
+                variant={person.isFollowing ? "secondary" : "primary"}
+                disabled={mutation.isPending && mutation.variables?.userId === person._id}
+                onClick={() => mutation.mutate({ userId: person._id, isFollowing: person.isFollowing })}
+              >
+                {mutation.isPending && mutation.variables?.userId === person._id
+                  ? person.isFollowing
+                    ? "Unfollowing..."
+                    : "Following..."
+                  : person.isFollowing
+                    ? "Unfollow"
+                    : "Follow"}
               </Button>
             </div>
           ))}

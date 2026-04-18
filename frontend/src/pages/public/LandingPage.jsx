@@ -220,11 +220,6 @@ export function LandingPage() {
               <strong>41 open roles</strong>
               <span>18 competitions and mentor matches ready this week.</span>
             </Card>
-            <div className="hero-badge-cluster">
-              <span>Portfolio-ready builds</span>
-              <span>Freelance momentum</span>
-              <span>Career signal</span>
-            </div>
           </div>
         </div>
       </section>

@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { User } from "../models/User.js";
 import { Wallet } from "../models/Wallet.js";
 import { Portfolio } from "../models/Portfolio.js";
@@ -11,6 +10,13 @@ import { sendResponse } from "../utils/response.js";
 import { signToken } from "../utils/tokens.js";
 import { buildAuthPlaceholders } from "../services/authService.js";
 import { buildGoogleAuthUrl, createGoogleState, exchangeGoogleCodeForProfile } from "../services/googleAuthService.js";
+import { sendPasswordResetEmail } from "../services/mailerService.js";
+import {
+  buildForgotPasswordResponse,
+  buildPasswordResetUrl,
+  createPasswordResetToken,
+  getPasswordResetExpiry,
+} from "../services/passwordResetService.js";
 
 const GOOGLE_STATE_COOKIE = "best_version_google_state";
 
@@ -295,19 +301,32 @@ export const googleCallback = asyncHandler(async (req, res) => {
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
+  let emailSent = false;
 
   if (user) {
-    user.resetPasswordToken = crypto.randomBytes(16).toString("hex");
-    user.resetPasswordExpiresAt = new Date(Date.now() + 1000 * 60 * 30);
+    user.resetPasswordToken = createPasswordResetToken();
+    user.resetPasswordExpiresAt = getPasswordResetExpiry();
     await user.save();
+
+    if (env.passwordResetEmailEnabled) {
+      try {
+        emailSent = await sendPasswordResetEmail({
+          to: user.email,
+          resetUrl: buildPasswordResetUrl(user.resetPasswordToken),
+        });
+      } catch (_error) {
+        emailSent = false;
+      }
+    }
   }
 
-  return sendResponse(res, {
-    message: "If that email exists, a reset token has been generated for local development.",
-    data: {
-      resetToken: user?.resetPasswordToken || null,
-    },
-  });
+  const response = buildForgotPasswordResponse(user);
+  if (emailSent) {
+    response.message = "If an account exists for this email, a reset link has been sent.";
+    response.data.emailDeliveryConfigured = true;
+  }
+
+  return sendResponse(res, response);
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {

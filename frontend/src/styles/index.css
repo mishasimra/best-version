@@ -194,6 +194,32 @@ p {
   resize: vertical;
 }
 
+.auth-password-wrap {
+  position: relative;
+}
+
+.auth-password-wrap input {
+  padding-right: 4.8rem;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--brand-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-password-toggle:hover {
+  opacity: 0.8;
+}
+
 .field small {
   color: var(--text-soft);
 }
@@ -1747,6 +1773,24 @@ p {
 
 .filters {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.courses-container {
+  gap: 1.5rem;
+}
+
+.courses-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.courses-results {
+  margin-top: 32px;
+}
+
+.courses-empty-state {
+  margin-top: 32px;
 }
 
 .course-grid {

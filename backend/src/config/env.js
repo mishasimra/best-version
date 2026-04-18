@@ -11,11 +11,20 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || "best-version-dev-secret",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   clientUrl: process.env.CLIENT_URL || "http://127.0.0.1:4173",
+  appBaseUrl: process.env.APP_BASE_URL || process.env.CLIENT_URL?.split(",")[0]?.trim() || "http://127.0.0.1:4173",
   clientUrls: (process.env.CLIENT_URL || "http://127.0.0.1:4173")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean),
+  enableDevResetLink: process.env.ENABLE_DEV_RESET_LINK === "true",
+  mailFrom: process.env.MAIL_FROM || "",
+  smtpHost: process.env.SMTP_HOST || "",
+  smtpPort: Number(process.env.SMTP_PORT || 587),
+  smtpUser: process.env.SMTP_USER || "",
+  smtpPass: process.env.SMTP_PASS || "",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
   googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || "",
 };
+
+env.passwordResetEmailEnabled = Boolean(env.mailFrom && env.smtpHost && env.smtpUser && env.smtpPass);

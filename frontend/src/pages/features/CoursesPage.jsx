@@ -25,8 +25,8 @@ export function CoursesPage() {
   if (isLoading) return <LoadingState label="Loading courses..." />;
 
   return (
-    <div className="stack-xl">
-      <Card className="filters">
+    <div className="stack-xl courses-container">
+      <Card className="filters courses-filters">
         <input placeholder="Search courses or tags" value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })} />
         <select value={filters.category} onChange={(e) => setFilters({ ...filters, category: e.target.value })}>
           <option value="all">All categories</option>
@@ -45,7 +45,7 @@ export function CoursesPage() {
         </select>
       </Card>
 
-      <div className="course-grid">
+      <div className="course-grid courses-results">
         {data.length ? (
           data.map((course) => (
             <Card key={course._id} className="course-card">
@@ -75,7 +75,9 @@ export function CoursesPage() {
             </Card>
           ))
         ) : (
-          <EmptyState title="No courses matched" description="Try broadening your search or switching the filter." />
+          <div className="courses-empty-state">
+            <EmptyState title="No courses matched" description="Try broadening your search or switching the filter." />
+          </div>
         )}
       </div>
     </div>

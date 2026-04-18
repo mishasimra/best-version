@@ -57,6 +57,22 @@ function GoogleAuthButton({ enabled, loading, onClick, helperText, noteClassName
   );
 }
 
+function PasswordField({ label, value, onChange }) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <label className="field auth-password-field">
+      <span>{label}</span>
+      <div className="auth-password-wrap">
+        <input type={showPassword ? "text" : "password"} value={value} onChange={onChange} />
+        <button type="button" className="auth-password-toggle" onClick={() => setShowPassword((current) => !current)}>
+          {showPassword ? "Hide" : "Show"}
+        </button>
+      </div>
+    </label>
+  );
+}
+
 function useAuthOptions() {
   const [googleConfig, setGoogleConfig] = useState({
     loading: true,
@@ -160,12 +176,7 @@ export function LoginPage() {
     <AuthLayout title="Welcome back" subtitle="Log in to continue building your best version.">
       <form className="stack" onSubmit={handleSubmit}>
         <Field label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <Field
-          label="Password"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
+        <PasswordField label="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <Button disabled={loading || googleLoading} type="submit">
           {loading ? "Signing in..." : "Log in"}
         </Button>
@@ -239,12 +250,7 @@ export function SignupPage() {
         >
           <Field label="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Field label="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <Field
-            label="Password"
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
+          <PasswordField label="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
           <label className="field">
             <span>Primary role</span>
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
@@ -311,27 +317,60 @@ export function SignupPage() {
 }
 
 export function ForgotPasswordPage() {
-  const [email, setEmail] = useState("aarav@student.best");
-  const [token, setToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState({
+    message: "",
+    resetUrl: "",
+    resetLinkEnabled: false,
+    emailDeliveryConfigured: false,
+  });
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const response = await api.post("/auth/forgot-password", { email });
-    setToken(response.data.data.resetToken || "");
-    toast.success("Reset token generated for local development");
+    setLoading(true);
+
+    try {
+      const response = await api.post("/auth/forgot-password", { email });
+      const data = response.data?.data || {};
+      setResult({
+        message: response.data?.message || "",
+        resetUrl: data.resetUrl || "",
+        resetLinkEnabled: Boolean(data.resetLinkEnabled),
+        emailDeliveryConfigured: Boolean(data.emailDeliveryConfigured),
+      });
+      toast.success(response.data?.message || "Password reset request created");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to create a reset link right now.");
+      setResult({
+        message: "",
+        resetUrl: "",
+        resetLinkEnabled: false,
+        emailDeliveryConfigured: false,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <AuthLayout title="Reset password" subtitle="Generate a development reset token and continue securely.">
+    <AuthLayout title="Reset password" subtitle="Enter your email and we'll help you continue to a secure password reset.">
       <form className="stack" onSubmit={handleSubmit}>
         <Field label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Button type="submit">Generate reset token</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Preparing reset link..." : "Generate reset token"}
+        </Button>
         <Link to="/login">Back to login</Link>
-        {token ? (
+        {result.message ? (
           <Card className="inline-note">
-            <strong>Token</strong>
-            <code>{token}</code>
-            <Link to={`/reset-password?token=${token}`}>Use this token</Link>
+            <strong>{result.emailDeliveryConfigured ? "Check your email" : "Reset link ready"}</strong>
+            <p>{result.message}</p>
+            {result.resetLinkEnabled && result.resetUrl ? (
+              <>
+                <code>{result.resetUrl}</code>
+                <a href={result.resetUrl}>Continue to reset password</a>
+              </>
+            ) : null}
           </Card>
         ) : null}
       </form>
@@ -344,20 +383,31 @@ export function ResetPasswordPage() {
   const [params] = useSearchParams();
   const [token, setToken] = useState(params.get("token") || "");
   const [password, setPassword] = useState("Password123");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    await api.post("/auth/reset-password", { token, password });
-    toast.success("Password reset");
-    navigate("/login");
+
+    try {
+      setLoading(true);
+      await api.post("/auth/reset-password", { token, password });
+      toast.success("Password reset");
+      navigate("/login");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Reset token is invalid or expired.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <AuthLayout title="Create a new password" subtitle="Use the token generated from the forgot password flow.">
+    <AuthLayout title="Create a new password" subtitle="Choose a fresh password and complete your reset securely.">
       <form className="stack" onSubmit={handleSubmit}>
         <Field label="Token" value={token} onChange={(e) => setToken(e.target.value)} />
         <Field label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <Button type="submit">Reset password</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Resetting password..." : "Reset password"}
+        </Button>
       </form>
     </AuthLayout>
   );
